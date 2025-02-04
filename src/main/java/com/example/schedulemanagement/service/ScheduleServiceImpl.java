@@ -86,13 +86,9 @@ public class ScheduleServiceImpl implements ScheduleService {//controller에서 
 
     @Override
     public void deleteSchedule(Long id, Map<String, String> password) {
-
         // memo 삭제
         int deletedRow = scheduleRepository.deleteSchedule(id, password.get("password"));
-        // 삭제된 row가 0개 라면
-        if (deletedRow == 0) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Does not exist id = " + id);
-        }
+
     }
 
     private ResponseEntity<Map<String, String>> createErrorResponse(HttpStatus status, String message) {
@@ -108,14 +104,15 @@ public class ScheduleServiceImpl implements ScheduleService {//controller에서 
     }
 
     @Override
-    public List<ScheduleResponseDto> findScheduleByCondition(String writer, LocalDate upDate) {
-        return scheduleRepository.findScheduleByCondition(writer, upDate);
+    public List<ScheduleResponseDto> findScheduleByCondition(String writer_name, LocalDate upDate) {
+        return scheduleRepository.findScheduleByCondition(writer_name, upDate);
     }
 
     @Override
-    public PageInfo<ScheduleResponseDto> findPages(PageRequestDto dto) {
+    public PageInfo<ScheduleResponseDto> findPages(int page, int size) {
 
-        return scheduleRepository.findPages(dto.getPage(),dto.getSize());
+      //  return scheduleRepository.findPages(dto.getPage(),dto.getSize());
+        return scheduleRepository.findPages(page,size);
 
     }
 

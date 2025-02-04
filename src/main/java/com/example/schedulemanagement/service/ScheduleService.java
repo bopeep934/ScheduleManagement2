@@ -24,7 +24,9 @@ public interface ScheduleService {//service 인터페이스
 
      List<ScheduleResponseDto> findScheduleByUpdate(LocalDate upDate);
 
-     List<ScheduleResponseDto> findScheduleByCondition(String writer, LocalDate upDate);
+     List<ScheduleResponseDto> findScheduleByCondition(String writer_name, LocalDate upDate);
 
-     PageInfo<ScheduleResponseDto> findPages(PageRequestDto dto);
+   //  PageInfo<ScheduleResponseDto> findPages(PageRequestDto dto);
+
+     PageInfo<ScheduleResponseDto> findPages(int page, int size);
 }

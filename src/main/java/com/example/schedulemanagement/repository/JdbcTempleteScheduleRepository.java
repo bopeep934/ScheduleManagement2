@@ -72,18 +72,35 @@ public class JdbcTempleteScheduleRepository implements ScheduleRepository {
     }
 
     @Override
-    public List<ScheduleResponseDto> findScheduleByWriter(String writer_id) {
-        return jdbcTemplate.query("select * from schedule where writer_id=?", scheduleRowMapper(), writer_id);
+    public List<ScheduleResponseDto> findScheduleByWriter(String writer_name) {
+        List<ScheduleResponseDto> result = jdbcTemplate.query("select * from schedule where writer_name=?", scheduleRowMapper(), writer_name);
+
+        if (result.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist writer_name = " + writer_name);
+        }
+        return result;
+
     }
 
     @Override
-    public List<ScheduleResponseDto> findScheduleByCondition(String writer_id, LocalDate upDate) {
-        return  jdbcTemplate.query("select * from schedule where writer_id = ? and DATE(modification_date) >= ? order by modification_date desc", scheduleRowMapper(), writer_id, upDate);
+    public List<ScheduleResponseDto> findScheduleByCondition(String writer_name, LocalDate upDate) {
+        List<ScheduleResponseDto> result =  jdbcTemplate.query("select * from schedule where writer_name = ? and DATE(modification_date) >= ? order by modification_date desc", scheduleRowMapper(), writer_name, upDate);
+
+        if (result.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist date = " + upDate + " ,writer_name =" + writer_name);
+        }
+        return result;
+
     }
 
     @Override
     public List<ScheduleResponseDto> findScheduleByUpdate(LocalDate upDate) {
-        return jdbcTemplate.query("select * from schedule where DATE(modification_date) >= ? order by modification_date desc", scheduleRowMapper(), upDate);
+        List<ScheduleResponseDto> result =   jdbcTemplate.query("select * from schedule where DATE(modification_date) >= ? order by modification_date desc", scheduleRowMapper(), upDate);
+
+        if (result.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist date = " + upDate);
+        }
+        return result;
     }
 
 //    @Override
@@ -103,9 +120,9 @@ public class JdbcTempleteScheduleRepository implements ScheduleRepository {
     }//에러메시지가 뜨질 않음.
 
     @Override
-    public int updateSchedule(Long id, String writer_id, String todo) {
+    public int updateSchedule(Long id, String writer_name, String todo) {
         System.out.println(LocalDateTime.now());
-        return jdbcTemplate.update("update schedule set writer_id = ?, todo = ? , modification_date = ? where id = ?", writer_id, todo, LocalDateTime.now(), id);
+        return jdbcTemplate.update("update schedule set writer_name = ?, todo = ? , modification_date = ? where id = ?", writer_name, todo, LocalDateTime.now(), id);
     }
 
 //    @Override
@@ -117,7 +134,13 @@ public class JdbcTempleteScheduleRepository implements ScheduleRepository {
     @Override
     public int deleteSchedule(Long id, String password) {
         //    if(jdbcTemplate.query("select * from schedule where id = ? and password =?", id, password )!=0)
-        return jdbcTemplate.update("delete from schedule where id = ? and password= ? ", id, password);
+        int deletedRow= jdbcTemplate.update("delete from schedule where id = ? and password= ? ", id, password);
+
+        System.out.println(deletedRow);
+        if (deletedRow == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, " Incorrect password.");
+        }
+        return deletedRow;
 
     }
 

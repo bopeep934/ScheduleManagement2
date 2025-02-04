@@ -19,13 +19,13 @@ public interface ScheduleRepository {
 
     List<ScheduleResponseDto> findAllSchedule();//모든 일정 반환
 
-    List<ScheduleResponseDto> findScheduleByWriter(String writer_id);
+    List<ScheduleResponseDto> findScheduleByWriter(String writer_name);
 
     //   Optional<Schedule> findScheduleById(Long id);//선택한 일정 반환
 
     Schedule findScheduleByIdOrElseThrow(Long id);
 
-    int updateSchedule(Long id, String writer_id, String contents);
+    int updateSchedule(Long id, String writer_name, String contents);
 
     //  int updateTodo(Long id, String toDo);
 
@@ -33,7 +33,7 @@ public interface ScheduleRepository {
 
     int deleteSchedule(Long id, String password);
 
-    List<ScheduleResponseDto> findScheduleByCondition(String writer, LocalDate upDate);
+    List<ScheduleResponseDto> findScheduleByCondition(String writer_name, LocalDate upDate);
 
     List<ScheduleResponseDto> findScheduleByUpdate(LocalDate upDate);
 }

@@ -6,6 +6,7 @@ import com.example.schedulemanagement.dto.ScheduleResponseDto;
 import com.example.schedulemanagement.entity.PageInfo;
 import com.example.schedulemanagement.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,11 +59,11 @@ public class ScheduleController {//main에서 가장 처음 데이터를 처리�
     public List<ScheduleResponseDto> findScheduleByWriter(@RequestBody ScheduleRequestDto dto) {//작성자id별+ 기간별 조회
         List<ScheduleResponseDto> findScheduleByCondition = null;
 
-        if (dto.getWriter_id() != null && dto.getFindDate() != null)
-            findScheduleByCondition = scheduleService.findScheduleByCondition(dto.getWriter_id(), dto.getFindDate());
-        if (dto.getWriter_id() != null && dto.getFindDate() == null)
-            findScheduleByCondition = scheduleService.findScheduleByWriter(dto.getWriter_id());
-        if (dto.getFindDate() != null && dto.getWriter_id() == null)
+        if (dto.getWriter_name() != null && dto.getFindDate() != null)
+            findScheduleByCondition = scheduleService.findScheduleByCondition(dto.getWriter_name(), dto.getFindDate());
+        if (dto.getWriter_name() != null && dto.getFindDate() == null)
+            findScheduleByCondition = scheduleService.findScheduleByWriter(dto.getWriter_name());
+        if (dto.getFindDate() != null && dto.getWriter_name() == null)
             findScheduleByCondition = scheduleService.findScheduleByUpdate(dto.getFindDate());
 
         return findScheduleByCondition;
@@ -79,7 +80,7 @@ public class ScheduleController {//main에서 가장 처음 데이터를 처리�
                                                               @PathVariable("id") Long id,
                                                               @RequestBody ScheduleRequestDto dto
     ) {
-        return new ResponseEntity<>(scheduleService.updateSchedule(id, dto.getWriter_id(), dto.getToDo()), HttpStatus.OK);
+        return new ResponseEntity<>(scheduleService.updateSchedule(id, dto.getWriter_name(), dto.getToDo()), HttpStatus.OK);
     }//요청객체의 정보를 받아 응답받기
 
 //    @PatchMapping("/{id}") //시간이 남으면 구현
@@ -102,9 +103,11 @@ public class ScheduleController {//main에서 가장 처음 데이터를 처리�
     }
 
     @GetMapping("/pages")
-    public PageInfo<ScheduleResponseDto> findPages(@RequestBody PageRequestDto dto) {
-        //   System.out.println("size:" +dto.getSize()+" page:" +dto.getPage());
-        return scheduleService.findPages(dto);
+    public PageInfo<ScheduleResponseDto> findPages(    @RequestParam("page") int page,
+                                                       @RequestParam("size") int size) {
+        log.info("page={}, size={}", page, size);
+   //     PageRequestDto dto=new PageRequestDto(page,size);
+        return scheduleService.findPages(page,size);
     }
 
 }

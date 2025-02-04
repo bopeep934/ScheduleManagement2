@@ -23,3 +23,8 @@ CREATE TABLE writer
     modification_date DATETIME     NOT NULL COMMENT '수정일',
     FOREIGN KEY (writer_id) REFERENCES schedule (writer_id)
 );
+
+ALTER TABLE writer DROP FOREIGN KEY writer_ibfk_1;
+ALTER TABLE writer ADD CONSTRAINT writer_ibfk_1
+FOREIGN KEY (writer_id) REFERENCES schedule(writer_id) ON DELETE CASCADE;
+//schedule 삭제시 같은  writer_id인 writer table의 행도 삭제
