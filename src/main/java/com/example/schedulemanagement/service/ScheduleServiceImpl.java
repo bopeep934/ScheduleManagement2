@@ -87,7 +87,22 @@ public class ScheduleServiceImpl implements ScheduleService {//controller에서 
     @Override
     public void deleteSchedule(Long id, Map<String, String> password) {
         // memo 삭제
-        int deletedRow = scheduleRepository.deleteSchedule(id, password.get("password"));
+        //   int deletedRow = scheduleRepository.deleteSchedule(id, password.get("password"));
+
+        String storedPassword = scheduleRepository.findPasswordById(id);
+
+        if (storedPassword == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.");
+        }
+
+        if (!storedPassword.equals(password.get("password"))) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Incorrect password.");
+        }
+
+        int result = scheduleRepository.deleteById(id);
+        if (result == 0) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete user.");
+        }
 
     }
 
@@ -111,8 +126,8 @@ public class ScheduleServiceImpl implements ScheduleService {//controller에서 
     @Override
     public PageInfo<ScheduleResponseDto> findPages(int page, int size) {
 
-      //  return scheduleRepository.findPages(dto.getPage(),dto.getSize());
-        return scheduleRepository.findPages(page,size);
+        //  return scheduleRepository.findPages(dto.getPage(),dto.getSize());
+        return scheduleRepository.findPages(page, size);
 
     }
 

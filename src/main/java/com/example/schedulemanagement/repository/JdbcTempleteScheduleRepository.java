@@ -49,15 +49,16 @@ public class JdbcTempleteScheduleRepository implements ScheduleRepository {
         //저장 후 생성된 key값 number 타입으로 반환하는 메서드
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters));
 
-        return new ScheduleResponseDto(key.longValue(),  schedule.getWriter_name(), schedule.getDate(), schedule.getUpDate(), schedule.getToDo());
+        return new ScheduleResponseDto(key.longValue(), schedule.getWriter_name(), schedule.getDate(), schedule.getUpDate(), schedule.getToDo());
 
 
     }
-    public PageInfo<ScheduleResponseDto> findPages(int page, int size){
+
+    public PageInfo<ScheduleResponseDto> findPages(int page, int size) {
 
         int offset = (page - 1) * size;
 
-        List<ScheduleResponseDto> pages = jdbcTemplate.query("SELECT * FROM schedule ORDER BY id LIMIT ? OFFSET ?",scheduleRowMapper(), size, offset);
+        List<ScheduleResponseDto> pages = jdbcTemplate.query("SELECT * FROM schedule ORDER BY id LIMIT ? OFFSET ?", scheduleRowMapper(), size, offset);
 
         // 전체 데이터 개수 조회
         int totalElements = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM schedule", Integer.class);
@@ -84,7 +85,7 @@ public class JdbcTempleteScheduleRepository implements ScheduleRepository {
 
     @Override
     public List<ScheduleResponseDto> findScheduleByCondition(String writer_name, LocalDate upDate) {
-        List<ScheduleResponseDto> result =  jdbcTemplate.query("select * from schedule where writer_name = ? and DATE(modification_date) >= ? order by modification_date desc", scheduleRowMapper(), writer_name, upDate);
+        List<ScheduleResponseDto> result = jdbcTemplate.query("select * from schedule where writer_name = ? and DATE(modification_date) >= ? order by modification_date desc", scheduleRowMapper(), writer_name, upDate);
 
         if (result.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist date = " + upDate + " ,writer_name =" + writer_name);
@@ -95,7 +96,7 @@ public class JdbcTempleteScheduleRepository implements ScheduleRepository {
 
     @Override
     public List<ScheduleResponseDto> findScheduleByUpdate(LocalDate upDate) {
-        List<ScheduleResponseDto> result =   jdbcTemplate.query("select * from schedule where DATE(modification_date) >= ? order by modification_date desc", scheduleRowMapper(), upDate);
+        List<ScheduleResponseDto> result = jdbcTemplate.query("select * from schedule where DATE(modification_date) >= ? order by modification_date desc", scheduleRowMapper(), upDate);
 
         if (result.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist date = " + upDate);
@@ -117,7 +118,7 @@ public class JdbcTempleteScheduleRepository implements ScheduleRepository {
 
 
         return result.stream().findAny().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id));
-    }//에러메시지가 뜨질 않음.
+    }
 
     @Override
     public int updateSchedule(Long id, String writer_name, String todo) {
@@ -131,19 +132,27 @@ public class JdbcTempleteScheduleRepository implements ScheduleRepository {
     /// /        return jdbcTemplate.update("update schedule set todo = ? where id = ?", todo, id);
     /// /    }
 
-    @Override
-    public int deleteSchedule(Long id, String password) {
-        //    if(jdbcTemplate.query("select * from schedule where id = ? and password =?", id, password )!=0)
-        int deletedRow= jdbcTemplate.update("delete from schedule where id = ? and password= ? ", id, password);
-
-        System.out.println(deletedRow);
-        if (deletedRow == 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, " Incorrect password.");
+//    @Override
+//    public int deleteSchedule(Long id, String password) {
+//       // int deletedRow= jdbcTemplate.update("delete from schedule where id = ? and password= ? ", id, password);
+//
+//        return deletedRow;
+//
+//    }
+    public String findPasswordById(Long id) {
+        String sql = "select password from schedule where id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, String.class, id);
+        } catch (Exception e) {
+            return null; // ID가 없으면 null 반환
         }
-        return deletedRow;
-
     }
 
+    // 사용자 삭제
+    public int deleteById(Long id) {
+        String sql = "DELETE FROM schedule WHERE id = ?";
+        return jdbcTemplate.update(sql, id);
+    }
 
 
     private RowMapper<ScheduleResponseDto> scheduleRowMapper() {

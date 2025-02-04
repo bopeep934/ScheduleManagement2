@@ -31,9 +31,13 @@ public interface ScheduleRepository {
 
     PageInfo<ScheduleResponseDto> findPages(int page, int size);
 
-    int deleteSchedule(Long id, String password);
+    //  int deleteSchedule(Long id, String password);
 
     List<ScheduleResponseDto> findScheduleByCondition(String writer_name, LocalDate upDate);
 
     List<ScheduleResponseDto> findScheduleByUpdate(LocalDate upDate);
+
+    int deleteById(Long id);
+
+    String findPasswordById(Long id);
 }
