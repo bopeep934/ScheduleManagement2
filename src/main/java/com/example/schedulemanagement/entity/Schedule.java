@@ -1,6 +1,8 @@
 package com.example.schedulemanagement.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,12 +14,21 @@ import java.time.LocalDateTime;
 public class Schedule {//일정 객체. 일정 하나의 정보를 담고 있다.
 
     private Long id;// 일정 고유 아이디, 자동 생성
+
     private String writer_id;//작성자
+
     private String writer_name;//작성자 이름 넣을 변수
+
+    @NotBlank(message ="비밀번호를 입력해주세요")
     private String password;//비밀번호
+
  // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-mm-dd")
     private final LocalDateTime date;//생성일, 변경 불가
+
     private LocalDateTime upDate;//수정일,
+
+    @NotBlank
+    @Size(min=1, max=200 , message= "200자 이내로 입력해주세요.")
     private String toDo;//할일
 
 

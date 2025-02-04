@@ -1,4 +1,5 @@
 package com.example.schedulemanagement.controller;
+import jakarta.validation.Valid;  // JDK 11 이상
 
 import com.example.schedulemanagement.dto.PageRequestDto;
 import com.example.schedulemanagement.dto.ScheduleRequestDto;
@@ -8,6 +9,7 @@ import com.example.schedulemanagement.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,8 +29,12 @@ public class ScheduleController {//main에서 가장 처음 데이터를 처리�
     }
 
     @PostMapping
-    public ResponseEntity<ScheduleResponseDto> createSchedule(@RequestBody ScheduleRequestDto dto) {//일정생성 메소드
+    public ResponseEntity<ScheduleResponseDto> createSchedule(@Valid @RequestBody ScheduleRequestDto dto, BindingResult result) {//일정생성 메소드
 
+        if(result.hasErrors()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "형식에 맞게 입력해주세요.");
+
+        }
         return new ResponseEntity<>(scheduleService.saveSchedule(dto), HttpStatus.CREATED);//상태메시지 반환과 동시에 c-> s호출하며 요청 dto보냄.
     }
 
@@ -76,7 +82,7 @@ public class ScheduleController {//main에서 가장 처음 데이터를 처리�
 //    }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSchedule( @PathVariable("id") Long id, @valid @RequestBody Map<String, String> passwordMap) {//선택한 일정 아이디 받아 삭제하기
+    public ResponseEntity<Void> deleteSchedule( @PathVariable("id") Long id, @RequestBody Map<String, String> passwordMap) {//선택한 일정 아이디 받아 삭제하기
  //       try {
             scheduleService.deleteSchedule(id, passwordMap);
 //        } catch (ResponseStatusException e) {

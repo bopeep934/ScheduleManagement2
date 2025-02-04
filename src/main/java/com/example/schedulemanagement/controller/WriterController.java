@@ -4,9 +4,11 @@ package com.example.schedulemanagement.controller;
 import com.example.schedulemanagement.dto.WriterRequestDto;
 import com.example.schedulemanagement.dto.WriterResponseDto;
 import com.example.schedulemanagement.service.WriterService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -26,22 +28,18 @@ public class WriterController {
     }
 
     @PostMapping
-    public ResponseEntity<WriterResponseDto> createWriter(@RequestBody WriterRequestDto dto) {//일정생성 메소드
-/*
-        // 식별자가 1씩 증가 하도록 만듦
-        Long memoId = memoList.isEmpty() ? 1 : Collections.max(memoList.keySet()) + 1;
+    public ResponseEntity<WriterResponseDto> createWriter(@Valid @RequestBody WriterRequestDto dto, BindingResult result) {//일정생성 메소드
+        if(result.hasErrors()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "형식에 맞게 입력해주세요.");
 
-        // 요청받은 데이터로 Memo 객체 생성
-        Memo memo = new Memo(memoId, dto.getTitle(), dto.getContents());
-
-        // Inmemory DB에 Memo 메모
-        memoList.put(memoId, memo);
-*/ //역할이 분담되므로 전부 지운다.
+        }
         return new ResponseEntity<>(writerService.saveWriter(dto), HttpStatus.CREATED);//상태메시지 반환과 동시에 c-> s호출하며 요청 dto보냄.
+
     }
 
     @GetMapping
     public List<WriterResponseDto> findAllWriter() {//작성자 전체 데이터 조회
+
 
         return writerService.listAllWriter();
 
