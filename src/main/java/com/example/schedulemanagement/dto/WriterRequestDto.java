@@ -12,7 +12,7 @@ public class WriterRequestDto {
 
     private String name;
 
-    @Email
+    @Email(message = "이메일 형식에 맞게 입력해주세요.")
     private String email;
 
     private LocalDateTime registration_date;

@@ -1,4 +1,5 @@
 package com.example.schedulemanagement.controller;
+
 import jakarta.validation.Valid;  // JDK 11 이상
 
 import com.example.schedulemanagement.dto.PageRequestDto;
@@ -10,9 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,10 +33,19 @@ public class ScheduleController {//main에서 가장 처음 데이터를 처리�
 
     @PostMapping
     public ResponseEntity<ScheduleResponseDto> createSchedule(@Valid @RequestBody ScheduleRequestDto dto, BindingResult result) {//일정생성 메소드
+        if (result.hasErrors()) {
 
-        if(result.hasErrors()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "형식에 맞게 입력해주세요.");
+            // 에러 메시지를 담을 리스트 생성
+            List<String> errorMessages = new ArrayList<>();
 
+            // 필드별 에러 메시지 추출
+            for (FieldError error : result.getFieldErrors()) {
+                String errorMessage = error.getDefaultMessage();  // 해당 필드의 에러 메시지 가져오기
+                errorMessages.add(errorMessage);
+            }
+
+            // 에러 메시지들을 한 번에 반환
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join(", ", errorMessages));
         }
         return new ResponseEntity<>(scheduleService.saveSchedule(dto), HttpStatus.CREATED);//상태메시지 반환과 동시에 c-> s호출하며 요청 dto보냄.
     }
@@ -46,7 +58,7 @@ public class ScheduleController {//main에서 가장 처음 데이터를 처리�
     }
 
     @GetMapping("/list")
-    public List<ScheduleResponseDto> findScheduleByWriter( @RequestBody ScheduleRequestDto dto) {//작성자id별+ 기간별 조회
+    public List<ScheduleResponseDto> findScheduleByWriter(@RequestBody ScheduleRequestDto dto) {//작성자id별+ 기간별 조회
         List<ScheduleResponseDto> findScheduleByCondition = null;
 
         if (dto.getWriter_name() != null && dto.getFindDate() != null)
@@ -82,9 +94,9 @@ public class ScheduleController {//main에서 가장 처음 데이터를 처리�
 //    }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSchedule( @PathVariable("id") Long id, @RequestBody Map<String, String> passwordMap) {//선택한 일정 아이디 받아 삭제하기
- //       try {
-            scheduleService.deleteSchedule(id, passwordMap);
+    public ResponseEntity<Void> deleteSchedule(@PathVariable("id") Long id, @RequestBody Map<String, String> passwordMap) {//선택한 일정 아이디 받아 삭제하기
+        //       try {
+        scheduleService.deleteSchedule(id, passwordMap);
 //        } catch (ResponseStatusException e) {
 //            log.error(e.getReason());
 //            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -95,11 +107,11 @@ public class ScheduleController {//main에서 가장 처음 데이터를 처리�
     }
 
     @GetMapping("/pages")
-    public PageInfo<ScheduleResponseDto> findPages(    @RequestParam("page") int page,
-                                                       @RequestParam("size") int size) {//페이지 목록 조회 controller
+    public PageInfo<ScheduleResponseDto> findPages(@RequestParam("page") int page,
+                                                   @RequestParam("size") int size) {//페이지 목록 조회 controller
         log.info("page={}, size={}", page, size);
-   //     PageRequestDto dto=new PageRequestDto(page,size);
-        return scheduleService.findPages(page,size);
+        //     PageRequestDto dto=new PageRequestDto(page,size);
+        return scheduleService.findPages(page, size);
     }
 
 }
