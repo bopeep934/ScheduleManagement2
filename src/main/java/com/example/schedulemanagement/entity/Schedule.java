@@ -19,7 +19,6 @@ public class Schedule {//일정 객체. 일정 하나의 정보를 담고 있다
 
     private String writer_name;//작성자 이름 넣을 변수
 
-    @NotBlank(message ="비밀번호를 입력해주세요")
     private String password;//비밀번호
 
  // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-mm-dd")
@@ -27,8 +26,6 @@ public class Schedule {//일정 객체. 일정 하나의 정보를 담고 있다
 
     private LocalDateTime upDate;//수정일,
 
-    @NotBlank
-    @Size(min=1, max=200 , message= "200자 이내로 입력해주세요.")
     private String toDo;//할일
 
 

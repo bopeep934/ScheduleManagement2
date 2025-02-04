@@ -13,7 +13,6 @@ public class Writer {
 
     private String name;
 
-    @Email
     private String email;
 
     private final LocalDateTime registration_date;
